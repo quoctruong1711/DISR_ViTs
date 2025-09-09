@@ -1,4 +1,4 @@
-# Document Image Shadow Removal Guided by Color-Aware Background
+# Document Image Shadow Removal based on Vision Transformers
 
 ## Requirements
 
@@ -27,14 +27,4 @@ Download the [pretrained model](https://drive.google.com/file/d/1zHolTv-fj_RsSUD
 ## TEST
  ```python test.py```
 
-## Cite
-
-```@InProceedings{Zhu_2022_CVPR,
-  @InProceedings{Zhang_2023_CVPR,
-  author  = {Ling Zhang,Yinghao He,Qing Zhang,Zheng Liu,Xiaolong Zhang,Chunxia Xiao},
-  title   = {Document Image Shadow Removal Guided by Color-Aware Background.},
-  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  month   = {June},
-  year   = {2023}}
-```
 
