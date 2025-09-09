@@ -29,8 +29,7 @@ logger = getLogger(__name__)
 
 def get_arguments() -> argparse.Namespace:
     """parse all the arguments from command line inteface return a list of
-    parsed arguments.
-    解析来自命令行界面的所有参数 返回一个被解析的参数列表被解析的参数"""
+    parsed arguments."""
     parser = argparse.ArgumentParser(
         description="""
         train a network for image classification with Flowers Recognition Dataset.
@@ -153,7 +152,6 @@ def main() -> None:
         val_time = int(time.time() - start)
 
         # save a model if top1 acc is higher than ever
-        # 因为使用自己的数据集没有严格划分验证集，所以保存在训练集上效果最好的参数
         if best_loss > train_loss:
             best_loss = train_loss
             torch.save(
