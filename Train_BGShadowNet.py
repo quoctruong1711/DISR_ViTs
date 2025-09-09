@@ -1,5 +1,3 @@
-# I am very grateful to the author of this code, which is used for reading datasets and other operations
-# https://github.com/IsHYuhi/BEDSR-Net_A_Deep_Shadow_Removal_Network_from_a_Single_Document_Image
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 import argparse
@@ -145,11 +143,11 @@ def main() -> None:
     n_classes = 1
 
     # define a model
-    cbeNet = ViTCBENet(pretrained_vit=config.vit_pretrained)  # 背景估计网络
+    cbeNet = ViTCBENet(pretrained_vit=config.vit_pretrained)  
     cbeNet_weights = torch.load('./pretrained/pretrained_ViTCBENet.prm')
     cbeNet.load_state_dict(fix_model_state_dict(cbeNet_weights))
-    firstStage_BGShadowNet = ViTBGShadowNet1(pretrained_vit=config.vit_pretrained)  # 第一阶段网络
-    secondStage_BGShadowNet = ViTBGShadowNet2(pretrained_vit=config.vit_pretrained)  # 第二阶段网络
+    firstStage_BGShadowNet = ViTBGShadowNet1(pretrained_vit=config.vit_pretrained)  
+    secondStage_BGShadowNet = ViTBGShadowNet2(pretrained_vit=config.vit_pretrained) 
     discriminator = Discriminator(6)
     if config.pretrained == True:
         firstStage_BGShadowNet_weights = torch.load('./pretrained/pretrained_firstStage_ViT_for_BGShadowNet.prm')
