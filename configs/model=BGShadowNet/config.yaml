@@ -8,7 +8,8 @@ lambda2: 0.01
 learning_rate: 0.0002
 loss_function_name: GAN
 max_epoch: 400
-model: BGShadowNet
+model: ViTBGShadowNet
+vit_pretrained: True
 num_workers: 4
 pretrained: True
 width: 256

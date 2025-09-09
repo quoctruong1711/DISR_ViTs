@@ -18,6 +18,7 @@ class Config:
 
     model: str = "BGShadowNet"
     pretrained: bool = True
+    vit_pretrained: bool = True
 
     batch_size: int = 32
 
