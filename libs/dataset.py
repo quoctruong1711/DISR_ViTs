@@ -29,8 +29,10 @@ def get_dataloader(
         logger.error(message)
         raise ValueError(message)
 
-    if train_model not in ["CBENet", "BGShadowNet", "stcgan-be"]:
-        message = f"dataset_name should be selected from ['benet', 'srnet', 'stcgan-be']."
+    if train_model not in ["CBENet", "BGShadowNet", "stcgan-be", "ViTCBENet", "ViTBGShadowNet"]:
+        message = (
+            "dataset_name should be selected from ['benet', 'srnet', 'stcgan-be']."
+        )
         logger.error(message)
         raise ValueError(message)
 
@@ -42,11 +44,9 @@ def get_dataloader(
     logger.info(f"Dataset: {dataset_name}\tSplit: {split}\tBatch size: {batch_size}.")
 
     csv_file = getattr(DATASET_CSVS[dataset_name], split)
-    if train_model == "CBENet":
+    if train_model in ["CBENet", "ViTCBENet"]:
         data = BackGroundDataset(csv_file, transform=transform)
-    elif train_model == "BGShadowNet":
-        data = ShadowDocumentDataset(csv_file, transform=transform)
-    elif train_model == "stcgan-be":
+    else:
         data = ShadowDocumentDataset(csv_file, transform=transform)
 
     dataloader = DataLoader(

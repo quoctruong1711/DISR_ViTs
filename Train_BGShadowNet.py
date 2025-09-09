@@ -18,9 +18,8 @@ from albumentations import (
     Normalize,
 )
 from albumentations.pytorch import ToTensorV2
-from libs.models.CBENet import *
-from libs.models.stageI import *
-from libs.models.stageII import *
+from libs.models.vit_cbenet import ViTCBENet
+from libs.models.vit_bgshadownet import ViTBGShadowNet1, ViTBGShadowNet2
 from libs.models.models import Discriminator
 from libs.checkpoint import save_checkpoint_BGShadowNet
 from libs.config import get_config
@@ -146,16 +145,16 @@ def main() -> None:
     n_classes = 1
 
     # define a model
-    cbeNet = CBENet(3)  # 背景估计网络
-    cbeNet_weights = torch.load('./pretrained/pretrained_CBENet.prm')
+    cbeNet = ViTCBENet(pretrained_vit=config.vit_pretrained)  # 背景估计网络
+    cbeNet_weights = torch.load('./pretrained/pretrained_ViTCBENet.prm')
     cbeNet.load_state_dict(fix_model_state_dict(cbeNet_weights))
-    firstStage_BGShadowNet = BGShadowNet1(3)  # 第一阶段网络
-    secondStage_BGShadowNet = BGShadowNet2(6)  # 第二阶段网络
+    firstStage_BGShadowNet = ViTBGShadowNet1(pretrained_vit=config.vit_pretrained)  # 第一阶段网络
+    secondStage_BGShadowNet = ViTBGShadowNet2(pretrained_vit=config.vit_pretrained)  # 第二阶段网络
     discriminator = Discriminator(6)
     if config.pretrained == True:
-        firstStage_BGShadowNet_weights = torch.load('./pretrained/pretrained_firstStage_for_BGShadowNet.prm')
+        firstStage_BGShadowNet_weights = torch.load('./pretrained/pretrained_firstStage_ViT_for_BGShadowNet.prm')
         firstStage_BGShadowNet.load_state_dict(fix_model_state_dict(firstStage_BGShadowNet_weights))
-        refine_weights = torch.load('./pretrained/pretrained_secondStage_for_BGShadowNet.prm')
+        refine_weights = torch.load('./pretrained/pretrained_secondStage_ViT_for_BGShadowNet.prm')
         secondStage_BGShadowNet.load_state_dict(fix_model_state_dict(refine_weights))
         discriminator_weights = torch.load('./pretrained/pretrained_discriminator_for_BGShadowNet.prm')
         discriminator.load_state_dict(fix_model_state_dict(discriminator_weights))
@@ -224,10 +223,10 @@ def main() -> None:
             torch.save(discriminator.state_dict(),
                        os.path.join(result_path, "pretrained_discriminator_for_BGShadowNet" + str(epoch) + ".prm"), )
             torch.save(firstStage_BGShadowNet.state_dict(),
-                       os.path.join(result_path, "pretrained_firstStage_for_BGShadowNet" + str(epoch) + ".prm"), )
+                       os.path.join(result_path, "pretrained_firstStage_ViT_for_BGShadowNet" + str(epoch) + ".prm"), )
             torch.save(
                 secondStage_BGShadowNet.state_dict(),
-                os.path.join(result_path, "pretrained_secondStage_for_BGShadowNet" + str(epoch) + ".prm"),
+                os.path.join(result_path, "pretrained_secondStage_ViT_for_BGShadowNet" + str(epoch) + ".prm"),
             )
         # save a model if top1 acc is higher than ever
         if best_g_loss > train_g_loss:
@@ -235,11 +234,11 @@ def main() -> None:
             best_d_loss = train_d_loss
             torch.save(
                 firstStage_BGShadowNet.state_dict(),
-                os.path.join(result_path, "pretrained_firstStage_for_BGShadowNet.prm"),
+                os.path.join(result_path, "pretrained_firstStage_ViT_for_BGShadowNet.prm"),
             )
             torch.save(
                 secondStage_BGShadowNet.state_dict(),
-                os.path.join(result_path, "pretrained_secondStage_for_BGShadowNet.prm"),
+                os.path.join(result_path, "pretrained_secondStage_ViT_for_BGShadowNet.prm"),
             )
             torch.save(
                 discriminator.state_dict(),
