@@ -1,9 +1,9 @@
 from logging import getLogger
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Sequence
 import pandas as pd
 import torch
 import cv2
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import ConcatDataset, DataLoader, Dataset
 import albumentations as A
 import numpy as np
 from .dataset_csv import DATASET_CSVS
@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 
 
 def get_dataloader(
-    dataset_name: str,
+    dataset_name: Sequence[str] | str,
     train_model: str,
     split: str,
     batch_size: int,
@@ -24,13 +24,21 @@ def get_dataloader(
     drop_last: bool = False,
     transform: Optional[A.Compose] = None,
 ) -> DataLoader:
-    if dataset_name not in DATASET_CSVS:
-        message = f"dataset_name should be selected from {list(DATASET_CSVS.keys())}."
-        logger.error(message)
-        raise ValueError(message)
+    if isinstance(dataset_name, str):
+        dataset_names = (dataset_name,)
+    else:
+        dataset_names = tuple(dataset_name)
 
-    if train_model not in ["CBENet", "BGShadowNet", "stcgan-be"]:
-        message = f"dataset_name should be selected from ['benet', 'srnet', 'stcgan-be']."
+    for name in dataset_names:
+        if name not in DATASET_CSVS:
+            message = f"dataset_name should be selected from {list(DATASET_CSVS.keys())}."
+            logger.error(message)
+            raise ValueError(message)
+
+    if train_model not in ["CBENet", "BGShadowNet", "stcgan-be", "ViTCBENet", "ViTBGShadowNet"]:
+        message = (
+            "dataset_name should be selected from ['benet', 'srnet', 'stcgan-be']."
+        )
         logger.error(message)
         raise ValueError(message)
 
@@ -39,15 +47,19 @@ def get_dataloader(
         logger.error(message)
         raise ValueError(message)
 
-    logger.info(f"Dataset: {dataset_name}\tSplit: {split}\tBatch size: {batch_size}.")
+    logger.info(
+        f"Dataset: {', '.join(dataset_names)}\tSplit: {split}\tBatch size: {batch_size}."
+    )
 
-    csv_file = getattr(DATASET_CSVS[dataset_name], split)
-    if train_model == "CBENet":
-        data = BackGroundDataset(csv_file, transform=transform)
-    elif train_model == "BGShadowNet":
-        data = ShadowDocumentDataset(csv_file, transform=transform)
-    elif train_model == "stcgan-be":
-        data = ShadowDocumentDataset(csv_file, transform=transform)
+    datasets = []
+    for name in dataset_names:
+        csv_file = getattr(DATASET_CSVS[name], split)
+        if train_model in ["CBENet", "ViTCBENet"]:
+            datasets.append(BackGroundDataset(csv_file, transform=transform))
+        else:
+            datasets.append(ShadowDocumentDataset(csv_file, transform=transform))
+
+    data = datasets[0] if len(datasets) == 1 else ConcatDataset(datasets)
 
     dataloader = DataLoader(
         data,

@@ -18,6 +18,7 @@ class Config:
 
     model: str = "BGShadowNet"
     pretrained: bool = True
+    vit_pretrained: bool = True
 
     batch_size: int = 32
 
@@ -29,7 +30,7 @@ class Config:
 
     learning_rate: float = 0.003
 
-    dataset_name: str = "Jung"
+    dataset_name: Tuple[str, ...] = ("Jung",)
 
     loss_function_name: str = "L1"
 
@@ -48,12 +49,13 @@ class Config:
         )
 
     def _value_check(self) -> None:
-        if self.dataset_name not in DATASET_CSVS:
-            message = (
-                f"dataset_name should be selected from {list(DATASET_CSVS.keys())}."
-            )
-            logger.error(message)
-            raise ValueError(message)
+        for name in self.dataset_name:
+            if name not in DATASET_CSVS:
+                message = (
+                    f"dataset_name should be selected from {list(DATASET_CSVS.keys())}."
+                )
+                logger.error(message)
+                raise ValueError(message)
 
         if self.max_epoch <= 0:
             message = "max_epoch must be positive."
@@ -108,6 +110,9 @@ def convert_list2tuple(_dict: Dict[str, Any]) -> Dict[str, Any]:
     for key, val in _dict.items():
         if isinstance(val, list):
             _dict[key] = tuple(val)
+
+    if "dataset_name" in _dict and isinstance(_dict["dataset_name"], str):
+        _dict["dataset_name"] = (_dict["dataset_name"],)
 
     logger.debug("converted list to tuple in dictionary.")
     return _dict

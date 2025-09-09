@@ -25,4 +25,9 @@ DATASET_CSVS = {
         val="./csv/RDD/val.csv",
         test="./csv/RDD/test.csv",
     ),
+    "Kliger": DatasetCSV(
+        train="./csv/Kliger/train.csv",
+        val="./csv/Kliger/val.csv",
+        test="./csv/Kliger/test.csv",
+    ),
 }

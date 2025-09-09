@@ -3,10 +3,11 @@ import datetime
 import os
 import time
 from logging import DEBUG, INFO, basicConfig, getLogger
-from libs.models.CBENet import *
 import torch
 import torch.optim as optim
 import wandb
+
+from libs.models.vit_cbenet import ViTCBENet
 from albumentations import (
     Compose,
     RandomResizedCrop,
@@ -104,7 +105,7 @@ def main() -> None:
         drop_last=True,
         transform=train_transform,
     )
-    model = CBENet(3)
+    model = ViTCBENet(pretrained_vit=config.vit_pretrained)
     # send the model to cuda/cpu
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
@@ -157,7 +158,7 @@ def main() -> None:
             best_loss = train_loss
             torch.save(
                 model.state_dict(),
-                os.path.join(result_path, "pretrained_CBENet.prm"),
+                os.path.join(result_path, "pretrained_ViTCBENet.prm"),
             )
 
         # save checkpoint every epoch
